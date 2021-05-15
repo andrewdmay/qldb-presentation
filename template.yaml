@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for qldb
+
+Parameters:
+  QldbLedger:
+    Description: Name of QLDB Ledger
+    Type: String
+    Default: ApiLedger
+  TopicName:
+    Description: Name of Topic to send events to
+    Type: String
+    Default: ApiEvents
+
+Resources:
+  QldbFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: api.app.handler
+      Runtime: python3.8
+      Timeout: 30
+      MemorySize: 256
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: QLDBPermissions
+              Effect: Allow
+              Action:
+                - qldb:DescribeLedger
+                - qldb:SendCommand
+              Resource:
+                - !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref TopicName
+      Environment:
+        Variables:
+          QLDB_LEDGER: !Ref QldbLedger
+          TOPIC_ARN: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${TopicName}
+      Events:
+        Api:
+          Type: HttpApi
+
+Outputs:
+  QldbApiApi:
+    Description: API Gateway endpoint URL
+    Value: !GetAtt ServerlessHttpApi.ApiEndpoint

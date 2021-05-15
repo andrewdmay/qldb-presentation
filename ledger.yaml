@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create QLDB Ledger
+
+Resources:
+  Ledger:
+    Type: AWS::QLDB::Ledger
+    Properties:
+      DeletionProtection: False
+      Name: ApiLedger
+      PermissionsMode: ALLOW_ALL
+
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: ApiEvents
+
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: ApiEventConsumer
+
+  Subscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt Queue.Arn
+      Protocol: sqs
+      RawMessageDelivery: True
+      TopicArn: !Ref Topic
+
+  QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref Queue
+      PolicyDocument:
+        Id: QueuePolicy
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - sqs:SendMessage
+            Effect: Allow
+            Principal: '*'
+            Resource: '*'
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref Topic
