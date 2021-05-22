@@ -10,6 +10,7 @@ python = "^3.8"
 boto3 = "^1.17.69"
 pyqldb = "^3.1.0"
 aws-kinesis-agg = "^1.1.7"
+protobuf = "3.15.8"
 
 [tool.poetry.dev-dependencies]
 

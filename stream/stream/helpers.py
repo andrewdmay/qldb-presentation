@@ -25,7 +25,6 @@ def filtered_records_generator(kinesis_deaggregate_records, table_names=None):
         payload = base64.b64decode(record['kinesis']['data'])
         # payload is the actual ion binary record published by QLDB to the stream
         ion_record = ion.loads(payload)
-        print("Ion record: ", (ion.dumps(ion_record, binary=False)))
 
         if ("recordType" in ion_record) and (ion_record["recordType"] == REVISION_DETAILS_RECORD_TYPE):
             table_info = get_table_info_from_revision_record(ion_record)

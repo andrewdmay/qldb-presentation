@@ -1,3 +1,4 @@
+import amazon.ion.simpleion as ion
 import logging
 from aws_kinesis_agg.deaggregator import deaggregate_records
 from .helpers import filtered_records_generator
@@ -24,4 +25,5 @@ def handler(event, context):
         document_id = revision_metadata["id"]
         version = revision_metadata["version"]
 
-        logger.info(f'Table: {table_name}, Id: {document_id}, Version: {version}, Data: {revision_metadata}')
+        logger.info(f'Table: {table_name}, Id: {document_id}, Version: {version}, '
+                    f'Data: {ion.dumps(revision_data, binary=False)}')
