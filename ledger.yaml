@@ -9,6 +9,50 @@ Resources:
       Name: ApiLedger
       PermissionsMode: ALLOW_ALL
 
+  LedgerKinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: ApiLedgerStream
+      RetentionPeriodHours: 24
+      ShardCount: 1
+      StreamEncryption:
+        EncryptionType: KMS
+        KeyId: alias/aws/kinesis
+
+  LedgerStreamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+            - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+              - qldb.amazonaws.com
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:DescribeStream
+                  - kinesis:ListShards
+                  - kinesis:PutRecord*
+                Resource: !GetAtt LedgerKinesisStream.Arn
+          PolicyName: WriteToKinesis
+
+  LedgerStream:
+    Type: AWS::QLDB::Stream
+    Properties:
+      InclusiveStartTime: '2021-01-01T00:00:00Z'
+      KinesisConfiguration:
+        AggregationEnabled: True
+        StreamArn: !GetAtt LedgerKinesisStream.Arn
+      LedgerName: !Ref Ledger
+      RoleArn: !GetAtt LedgerStreamRole.Arn
+      StreamName: Api
+
   Topic:
     Type: AWS::SNS::Topic
     Properties:

@@ -11,12 +11,16 @@ Parameters:
     Description: Name of Topic to send events to
     Type: String
     Default: ApiEvents
+  StreamName:
+    Description: Name of Kinesis Stream
+    Type: String
+    Default: ApiLedgerStream
 
 Resources:
-  QldbFunction:
+  ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
+      CodeUri: api/
       Handler: api.app.handler
       Runtime: python3.8
       Timeout: 30
@@ -40,6 +44,22 @@ Resources:
       Events:
         Api:
           Type: HttpApi
+
+  StreamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: stream/
+      Handler: stream.app.handler
+      Runtime: python3.8
+      Timeout: 30
+      MemorySize: 256
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${StreamName}
+            StartingPosition: TRIM_HORIZON
+            MaximumRetryAttempts: 0
 
 Outputs:
   QldbApiApi:
