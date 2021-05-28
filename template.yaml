@@ -21,6 +21,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: api/
+      FunctionName: Qldb-Api
       Handler: api.app.handler
       Runtime: python3.8
       Timeout: 30
@@ -49,9 +50,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: stream/
+      FunctionName: Qldb-Stream
       Handler: stream.app.handler
       Runtime: python3.8
-      Timeout: 30
+      Timeout: 120
       MemorySize: 256
       Events:
         Stream:
