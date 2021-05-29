@@ -29,13 +29,21 @@ Resources:
       Policies:
         - Version: '2012-10-17'
           Statement:
-            - Sid: QLDBPermissions
+            - Sid: LedgerPermissions
               Effect: Allow
               Action:
-                - qldb:DescribeLedger
                 - qldb:SendCommand
               Resource:
                 - !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}
+            - Sid: TablePermissions
+              Effect: Allow
+              Action:
+                - qldb:PartiQLSelect
+                - qldb:PartiQLInsert
+                - qldb:PartiQLUpdate
+              Resource:
+                # All Tables, but if we know the table-id (not name) this can be restricted to the ApiEvent table
+                - !Sub arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${QldbLedger}/table/*
         - SNSPublishMessagePolicy:
             TopicName: !Ref TopicName
       Environment:
