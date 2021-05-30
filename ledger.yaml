@@ -7,7 +7,7 @@ Resources:
     Properties:
       DeletionProtection: False
       Name: ApiLedger
-      PermissionsMode: ALLOW_ALL
+      PermissionsMode: STANDARD
 
   LedgerKinesisStream:
     Type: AWS::Kinesis::Stream
