@@ -189,8 +189,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Requirements
-requirements.txt
 
 ### VisualStudioCode ###
 .vscode/*
