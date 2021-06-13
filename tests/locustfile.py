@@ -4,12 +4,12 @@ from locust import HttpUser, task, between
 
 
 class QuickstartUser(HttpUser):
-    wait_time = between(1, 2.5)
+    wait_time = between(2, 3.5)
 
     @task
     def send_event(self):
         event = {
-            'id': random.randint(0, 100),
+            'id': random.randint(0, 99),
             'timestamp': datetime.datetime.now().isoformat(),
             'details': {
                 'type': 'TEST',
